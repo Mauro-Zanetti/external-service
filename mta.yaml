@@ -1,0 +1,72 @@
+_schema-version: '3.1'
+ID: cap-partner
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npx cds build --production
+modules:
+  - name: cap-partner-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: cap-partner-auth
+      - name: destination
+      - name: connectivity
+
+resources:
+  - name: cap-partner-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: cap-partner-${org}-${space}
+        tenant-mode: dedicated
+
+  - name: destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-name: cap-partner-dest
+      service: destination
+      service-plan: lite
+
+  - name: connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-name: cap-partner-connectivity
+      service: connectivity
+      service-plan: lite
+
+  - name: cap-destHandeler-dest
+    type: destination
+    requires:
+      - name: srv-api
+    parameters:
+      config:
+        init_data:
+          subaccount:
+            existing_destinations_policy: update
+            existing_certificates_policy: update
+            destinations:
+              - Name: cap-destHandeler
+                URL: ~{srv-api/srv-url}
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+                HTML5Runtime_enabled: "true"
+                HTML5.ForwardAuthToken: "true"
+                HTML5.DynamicDestination: "true"
