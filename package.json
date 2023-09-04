@@ -17,7 +17,8 @@
     "@sap/cds-dk": "^7"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "deploy": "npm i && mbt build && cf deploy mta_archives/cap-partner_1.0.0.mtar --retries 1"
   },
   "cds": {
     "requires": {
@@ -25,7 +26,10 @@
         "kind": "odata-v2",
         "model": "srv/external/API_BUSINESS_PARTNER",
         "credentials": {
-          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_BUSINESS_PARTNER"
+          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_BUSINESS_PARTNER",
+          "headers": {
+            "APIKey": ""
+          }
         }
       },
       "[production]": {
