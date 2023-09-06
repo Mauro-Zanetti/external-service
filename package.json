@@ -26,15 +26,11 @@
         "kind": "odata-v2",
         "model": "srv/external/API_BUSINESS_PARTNER",
         "credentials": {
-          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_BUSINESS_PARTNER",
-          "headers": {
-            "APIKey": ""
-          }
+          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_BUSINESS_PARTNER"
         }
       },
       "[production]": {
-        "auth": "xsuaa",
-        "restrict_all_services": false
+        "auth": "xsuaa"
       }
     }
   }
